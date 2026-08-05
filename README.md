@@ -72,7 +72,7 @@ New sessions index themselves via the hook. For history from before install, run
 ~/.claude/scripts/session-backfill.sh --days 365 --limit 100
 ```
 
-Idempotent — already-indexed sessions are skipped. One sequential Haiku call per session (~5-10s each).
+Idempotent — already-indexed sessions are skipped. Parallel Haiku calls (`--jobs`, default 4) — index writes are lock-serialized.
 
 ## Uninstall
 

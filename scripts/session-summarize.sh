@@ -58,6 +58,18 @@ do_summary() {
       --arg ts "$(date -u '+%Y-%m-%dT%H:%M:%SZ')" \
       '{sessionId:$sid, cwd:$cwd, project:$proj, updatedAt:$ts, summary:$sum, keywords:$kw}')"
 
+  # serialize index writes: mkdir spinlock (portable; macOS has no flock).
+  # Steal locks older than 60s (crashed writer).
+  LOCK="$INDEX_FILE.lock"
+  n=0
+  until mkdir "$LOCK" 2>/dev/null; do
+    n=$((n+1))
+    if [[ $n -gt 300 ]]; then exit 0; fi
+    [[ -d "$LOCK" && -z "$(find "$LOCK" -mmin -1 2>/dev/null)" ]] && rmdir "$LOCK" 2>/dev/null
+    sleep 0.2
+  done
+  trap 'rmdir "$LOCK" 2>/dev/null' EXIT
+
   # rewrite index: upsert this session, prune entries whose transcript is gone
   TMP="$INDEX_FILE.tmp.$$"
   {

@@ -15,7 +15,7 @@ Backfill the session search index (`~/.claude/session-index.jsonl`) with Haiku s
    bash ~/.claude/scripts/session-backfill.sh --dry-run [--days N] [--limit N] [--project <slug>]
    ```
 
-2. Then run it for real (drop `--dry-run`). Defaults: `--days 60`, `--limit 30`. Each session = one small Haiku call, run sequentially — ~5-10s per session, so mention it may take a few minutes for large batches.
+2. Then run it for real (drop `--dry-run`). Defaults: `--days 60`, `--limit 30`, `--jobs 4`. Each session = one small Haiku call (~5-10s), run in parallel batches of `--jobs` — ~30s per 8 sessions at default parallelism.
 
 3. Report the final `indexed: N, skipped: M` line. Skipped = already indexed, fewer than 2 user messages, or Haiku failure.
 
@@ -23,6 +23,7 @@ Backfill the session search index (`~/.claude/session-index.jsonl`) with Haiku s
 
 - `--days N` — how far back to look (default 60).
 - `--limit N` — max sessions to index this run (default 30, caps cost).
+- `--jobs N` — parallel Haiku calls (default 4).
 - `--project <substring>` — only sessions from matching project dirs.
 - `--dry-run` — list candidates without calling Haiku.
 
