@@ -3,12 +3,12 @@
 Find your lost Claude Code sessions by describing what they were about — not by scrolling the `/resume` picker's first-message titles.
 
 ```
-/find-session netsuite deposit export CT-59976
+/find-session flaky webhook retry bug
 ```
 
 ```
-2026-08-05  Investigated CT-59976: deposits failing to export to NetSuite...
-    resume: cd /Users/you/work && claude --resume 83856ddf-797e-4634-81aa-ed63407e0988
+2026-08-05  Fixed flaky retry logic in the webhook handler: added exponential backoff...
+    resume: cd /Users/you/projects/my-app && claude --resume 1a2b3c4d-5e6f-7a8b-9c0d-1e2f3a4b5c6d
 ```
 
 ## What you get
@@ -46,7 +46,7 @@ From the shell:
 
 - Multi-term query = AND, case-insensitive.
 - `--days N` — how far back (default 60).
-- `--project <substring>` — filter by project dir slug (e.g. `work`, `my-repo`).
+- `--project <substring>` — filter by project dir slug (e.g. `my-app`, `dotfiles`).
 - `--all-text` — also search assistant messages, not just yours.
 
 ## How summaries work
@@ -54,7 +54,7 @@ From the shell:
 The Stop hook fires when Claude finishes a turn. It backgrounds itself (never delays your session), debounces to once per 10 minutes per session, skips sessions with fewer than 2 user messages, and calls `claude -p --model haiku` on your messages only. Result is upserted into `~/.claude/session-index.jsonl`:
 
 ```json
-{"sessionId":"abc-123","cwd":"/Users/you/work","project":"-Users-you-work","updatedAt":"2026-08-05T09:00:00Z","summary":"Investigated CT-1234: ...","keywords":"CT-1234, netsuite, deposits"}
+{"sessionId":"abc-123","cwd":"/Users/you/projects/my-app","project":"-Users-you-projects-my-app","updatedAt":"2026-08-05T09:00:00Z","summary":"Fixed flaky retry logic in the webhook handler...","keywords":"webhooks, retry, exponential backoff, payments API"}
 ```
 
 Cost: one small Haiku call per active session per 10+ minutes. Failures are silent — the hook never breaks your session.
