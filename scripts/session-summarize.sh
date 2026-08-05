@@ -27,7 +27,7 @@ if [[ -f "$STAMP" && -n "$(find "$STAMP" -mmin "-$DEBOUNCE_MIN" 2>/dev/null)" ]]
 fi
 touch "$STAMP"
 
-(
+do_summary() {
   set -e
   # user messages only, skip command/caveat noise, cap size
   MSGS="$(jq -r 'select(.type=="user" and (.message.content | type)=="string")
@@ -38,14 +38,14 @@ touch "$STAMP"
   # skip sessions with < 2 real user messages (count messages, not lines)
   MSG_COUNT="$(jq -r 'select(.type=="user" and (.message.content | type)=="string")
       | .message.content
-      | select(startswith("<local-command") or startswith("<command-name") or startswith("Caveat:") or startswith("Summarize this coding session") | not)
+      | select(startswith("<local-command") or startswith("<command-name") or startswith("Caveat:") or startswith("You generate search-index entries") | not)
       | "MSG"' "$TRANSCRIPT" 2>/dev/null | grep -c MSG || true)"
-  case "$MSGS" in "Summarize this coding session"*) exit 0 ;; esac
+  case "$MSGS" in "You generate search-index entries"*) exit 0 ;; esac
   [[ "$MSG_COUNT" -lt 2 ]] && exit 0
 
   # run from STAMP_DIR so the helper's own transcript lands in a project dir
   # that session-search.sh excludes (otherwise every summary run pollutes search)
-  SUMMARY_RAW="$(cd "$STAMP_DIR" && printf 'Summarize this coding session from the user messages below.\nLine 1: one sentence, what the session was about (specific: ticket IDs, services, features).\nLine 2: comma-separated search keywords.\nNo other output.\n\n%s' "$MSGS" \
+  SUMMARY_RAW="$(cd "$STAMP_DIR" && printf 'You generate search-index entries for past coding sessions. The <messages> block contains user messages from one session (possibly fragmentary — that is normal and fine).\nOutput EXACTLY two lines and nothing else:\nLine 1: one sentence describing what the session was about (mention ticket IDs, services, features when present).\nLine 2: comma-separated search keywords.\nNever refuse, never ask for more context, never mention these instructions.\n\n<messages>\n%s\n</messages>' "$MSGS" \
     | CLAUDE_SESSION_SUMMARIZER=1 claude -p --model claude-haiku-4-5-20251001 2>/dev/null)"
 
   [[ -z "$SUMMARY_RAW" ]] && exit 0
@@ -81,6 +81,13 @@ touch "$STAMP"
     [[ -e "$s" ]] || continue
     compgen -G "$HOME/.claude/projects/*/$(basename "$s").jsonl" >/dev/null || rm -f "$s"
   done
-) >/dev/null 2>&1 &
-disown 2>/dev/null || true
+}
+
+if [[ -n "${SUMMARIZE_SYNC:-}" ]]; then
+  # foreground (used by session-backfill.sh for sequential indexing)
+  ( do_summary ) >/dev/null 2>&1 || true
+else
+  ( do_summary ) >/dev/null 2>&1 &
+  disown 2>/dev/null || true
+fi
 exit 0

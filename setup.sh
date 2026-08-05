@@ -20,11 +20,11 @@ command -v claude >/dev/null 2>&1 && ok "claude CLI" || fail "claude CLI missing
 echo
 echo "Installing files..."
 mkdir -p "$CLAUDE_DIR/scripts" "$CLAUDE_DIR/skills"
-cp "$REPO_DIR/scripts/session-search.sh" "$REPO_DIR/scripts/session-summarize.sh" "$CLAUDE_DIR/scripts/"
-chmod +x "$CLAUDE_DIR/scripts/session-search.sh" "$CLAUDE_DIR/scripts/session-summarize.sh"
+cp "$REPO_DIR/scripts/"*.sh "$CLAUDE_DIR/scripts/"
+chmod +x "$CLAUDE_DIR/scripts/"session-*.sh
 ok "scripts → ~/.claude/scripts/"
-cp -R "$REPO_DIR/skill/find-session" "$CLAUDE_DIR/skills/"
-ok "skill → ~/.claude/skills/find-session/"
+cp -R "$REPO_DIR/skill/"* "$CLAUDE_DIR/skills/"
+ok "skills → ~/.claude/skills/ (find-session, index-sessions)"
 
 echo
 echo "Registering Stop hook (Haiku session summaries)..."
