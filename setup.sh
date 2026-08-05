@@ -43,7 +43,7 @@ fi
 
 echo
 echo "Smoke test..."
-if bash "$CLAUDE_DIR/scripts/session-search.sh" 2>&1 | grep -q usage; then
+if { bash "$CLAUDE_DIR/scripts/session-search.sh" 2>&1 || true; } | grep -q usage; then
   ok "session-search.sh runs"
 else
   fail "session-search.sh did not run"
