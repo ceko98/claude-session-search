@@ -24,7 +24,7 @@ Search checks the Haiku summary index first (high signal), then falls back to gr
 ## Install
 
 ```bash
-git clone <this-repo> && cd claude-session-search
+git clone https://github.com/ceko98/claude-session-search.git && cd claude-session-search
 ./setup.sh
 ```
 
