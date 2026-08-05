@@ -21,7 +21,7 @@ Search past Claude Code sessions by content and give the user a resume command.
 
 3. **Zero hits** → loosen: fewer/shorter terms, add `--all-text`, raise `--days` (e.g. `--days 365`).
 
-4. Present top results (max ~10): date, title (Haiku summary when available), match snippet, and the `cd <dir> && claude --resume <session-id>` command ready to paste. Newest first. Keep output short.
+4. Present top results (max ~10): date, title (Haiku summary when available), match snippet, and BOTH resume options — the shell command `cd <dir> && claude --resume <session-id>` and the in-app command `/resume <session-id>` (usable directly in an already-open Claude session in that project). Newest first. Keep output short.
 
 ## Notes
 

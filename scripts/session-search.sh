@@ -102,5 +102,6 @@ printf '%s\n' "$HITS" | head -15 | while IFS= read -r f; do
   echo "    title:  ${title:-<untitled>}"
   [[ -n "$snippet" ]] && printf '%s\n' "$snippet" | sed 's/^/    match:  …/;s/$/…/'
   echo "    resume: cd ${cwd:-$HOME} && claude --resume $sid"
+  echo "    in-app: /resume $sid"
   echo
 done
