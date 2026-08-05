@@ -59,6 +59,8 @@ The Stop hook fires when Claude finishes a turn. It backgrounds itself (never de
 
 Cost: one small Haiku call per active session per 10+ minutes. Failures are silent — the hook never breaks your session.
 
+The index self-prunes: every summary write drops entries (and debounce stamps) for sessions whose transcript no longer exists, so it only ever holds live sessions. It's also safe to delete `~/.claude/session-index.jsonl` entirely — it rebuilds as you work.
+
 ## Uninstall
 
 ```bash

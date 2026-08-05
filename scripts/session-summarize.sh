@@ -58,9 +58,29 @@ touch "$STAMP"
       --arg ts "$(date -u '+%Y-%m-%dT%H:%M:%SZ')" \
       '{sessionId:$sid, cwd:$cwd, project:$proj, updatedAt:$ts, summary:$sum, keywords:$kw}')"
 
+  # rewrite index: upsert this session, prune entries whose transcript is gone
   TMP="$INDEX_FILE.tmp.$$"
-  { [[ -f "$INDEX_FILE" ]] && grep -v -- "$SID" "$INDEX_FILE" || true; printf '%s\n' "$LINE"; } > "$TMP"
+  {
+    if [[ -f "$INDEX_FILE" ]]; then
+      while IFS= read -r old; do
+        osid="$(printf '%s' "$old" | jq -r '.sessionId // empty' 2>/dev/null)"
+        [[ -z "$osid" || "$osid" == "$SID" ]] && continue
+        if compgen -G "$HOME/.claude/projects/*/$osid.jsonl" >/dev/null; then
+          printf '%s\n' "$old"
+        else
+          rm -f "$STAMP_DIR/$osid"
+        fi
+      done < "$INDEX_FILE"
+    fi
+    printf '%s\n' "$LINE"
+  } > "$TMP"
   mv "$TMP" "$INDEX_FILE"
+
+  # sweep orphan stamps (sessions whose transcript is gone)
+  for s in "$STAMP_DIR"/*; do
+    [[ -e "$s" ]] || continue
+    compgen -G "$HOME/.claude/projects/*/$(basename "$s").jsonl" >/dev/null || rm -f "$s"
+  done
 ) >/dev/null 2>&1 &
 disown 2>/dev/null || true
 exit 0
