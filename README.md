@@ -77,7 +77,7 @@ Idempotent — already-indexed sessions are skipped. Parallel Haiku calls (`--jo
 ## Uninstall
 
 ```bash
-rm -rf ~/.claude/skills/find-session ~/.claude/scripts/session-search.sh ~/.claude/scripts/session-summarize.sh ~/.claude/session-index.jsonl ~/.claude/session-index-stamps
+rm -rf ~/.claude/skills/find-session ~/.claude/skills/index-sessions ~/.claude/scripts/session-search.sh ~/.claude/scripts/session-summarize.sh ~/.claude/scripts/session-backfill.sh ~/.claude/session-index.jsonl ~/.claude/session-index-stamps
 ```
 
 Then remove the `Stop` hook entry from `~/.claude/settings.json`.
